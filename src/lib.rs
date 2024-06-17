@@ -362,17 +362,20 @@ impl<O, T: ?Sized> OwningRef<O, T> {
         }
     }
 
-    pub fn map_handle<F>(self, f: F) -> OwningHandle<O, H>
-        where F: FnOnce(*const O::Target) -> H
+    /// Map into a handle. Useful when the return value is owned
+    pub fn map_handle<F, H: Deref>(self, f: F) -> OwningHandle<O, H>
+    where
+        O: StableAddress,
+        F: FnOnce(*const T) -> H,
     {
         let h: H;
         {
-            h = f(o.deref() as *const O::Target);
+            h = f(self.reference as *const T);
         }
 
         OwningHandle {
-          handle: h,
-          _owner: o,
+            handle: h,
+            _owner: self.owner,
         }
     }
 
