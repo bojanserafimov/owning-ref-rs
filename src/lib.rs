@@ -922,6 +922,22 @@ impl<O, H> OwningHandle<O, H>
         })
     }
 
+    /// Erases the concrete base type of the owner with a trait object.
+    ///
+    /// This allows mixing of owned references with different owner base types.
+    ///
+    /// Similar to `OwningRef::erase_owner` (see examples there)
+    pub fn erase_owner<'a>(self) -> OwningHandle<O::Erased, H>
+    where
+        O: IntoErased<'a>,
+        O::Erased: StableAddress,
+    {
+        OwningHandle {
+            handle: self.handle,
+            _owner: self._owner.into_erased(),
+        }
+    }
+
     /// A getter for the underlying owner.
     pub fn as_owner(&self) -> &O {
         &self._owner
