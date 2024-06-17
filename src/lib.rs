@@ -1233,6 +1233,24 @@ unsafe impl<'a, T: 'a> IntoErased<'a> for Arc<T> {
         self
     }
 }
+unsafe impl<'a, O: 'a, R: 'a> IntoErased<'a> for OwningRef<Box<O>, R> {
+    type Erased = Box<dyn Erased + 'a>;
+    fn into_erased(self) -> Self::Erased {
+        self.owner
+    }
+}
+unsafe impl<'a, O: 'a, R: 'a> IntoErased<'a> for OwningRef<Rc<O>, R> {
+    type Erased = Rc<dyn Erased + 'a>;
+    fn into_erased(self) -> Self::Erased {
+        self.owner
+    }
+}
+unsafe impl<'a, O: 'a, R: 'a> IntoErased<'a> for OwningRef<Arc<O>, R> {
+    type Erased = Arc<dyn Erased + 'a>;
+    fn into_erased(self) -> Self::Erased {
+        self.owner
+    }
+}
 
 /// Typedef of a owning reference that uses an erased `Box` as the owner.
 pub type ErasedBoxRef<U> = OwningRef<Box<dyn Erased>, U>;
