@@ -362,6 +362,20 @@ impl<O, T: ?Sized> OwningRef<O, T> {
         }
     }
 
+    pub fn map_handle<F>(self, f: F) -> OwningHandle<O, H>
+        where F: FnOnce(*const O::Target) -> H
+    {
+        let h: H;
+        {
+            h = f(o.deref() as *const O::Target);
+        }
+
+        OwningHandle {
+          handle: h,
+          _owner: o,
+        }
+    }
+
     /// Converts `self` into a new owning reference that points at something reachable
     /// from the previous one or from the owner itself.
     ///
