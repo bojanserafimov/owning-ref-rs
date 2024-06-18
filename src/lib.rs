@@ -922,6 +922,19 @@ impl<O, H> OwningHandle<O, H>
         })
     }
 
+    /// Converts `self` into a new owning handle that points at someting reachable
+    /// from the previous one
+    pub fn map<F, U>(self, f: F) -> OwningHandle<O, U>
+    where
+        U: Deref,
+        F: FnOnce(&<H as Deref>::Target) -> U,
+    {
+        OwningHandle {
+            handle: f(&self),
+            _owner: self._owner,
+        }
+    }
+
     /// Erases the concrete base type of the owner with a trait object.
     ///
     /// This allows mixing of owned references with different owner base types.
