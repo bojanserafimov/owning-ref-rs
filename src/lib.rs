@@ -366,11 +366,13 @@ impl<O, T: ?Sized> OwningRef<O, T> {
     pub fn map_handle<F, H: Deref>(self, f: F) -> OwningHandle<O, H>
     where
         O: StableAddress,
-        F: FnOnce(*const T) -> H,
+        F: FnOnce(&T) -> H,
     {
         let h: H;
         {
-            h = f(self.reference as *const T);
+            let pointer = self.reference as *const T;
+            let reference = unsafe { pointer.as_ref() }.unwrap();
+            h = f(reference);
         }
 
         OwningHandle {
