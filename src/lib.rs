@@ -368,15 +368,8 @@ impl<O, T: ?Sized> OwningRef<O, T> {
         O: StableAddress,
         F: FnOnce(&T) -> H,
     {
-        let h: H;
-        {
-            let pointer = self.reference as *const T;
-            let reference = unsafe { pointer.as_ref() }.unwrap();
-            h = f(reference);
-        }
-
         OwningHandle {
-            handle: h,
+            handle: f(&self),
             _owner: self.owner,
         }
     }
