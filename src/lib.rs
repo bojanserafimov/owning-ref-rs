@@ -290,6 +290,17 @@ pub unsafe trait IntoErased<'a> {
     fn into_erased(self) -> Self::Erased;
 }
 
+/// TODO document
+pub struct Pointer<T>(*const T);
+
+impl<T> Deref for Pointer<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        unsafe { &*self.0 }
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // OwningRef
 /////////////////////////////////////////////////////////////////////////////
@@ -359,6 +370,18 @@ impl<O, T: ?Sized> OwningRef<O, T> {
         OwningRef {
             reference: f(&self),
             owner: self.owner,
+        }
+    }
+
+    /// TODO document
+    pub fn to_handle(self) -> OwningHandle<O, Pointer<T>>
+    where
+        T: Sized,
+        O: StableAddress,
+    {
+        OwningHandle {
+            handle: Pointer(self.reference),
+            _owner: self.owner,
         }
     }
 
