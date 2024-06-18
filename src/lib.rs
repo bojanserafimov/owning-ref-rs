@@ -362,25 +362,6 @@ impl<O, T: ?Sized> OwningRef<O, T> {
         }
     }
 
-    /// Map into a handle. Useful when the return value is owned
-    pub fn map_handle<F, H: Deref>(self, f: F) -> OwningHandle<O, H>
-    where
-        O: StableAddress,
-        F: FnOnce(&T) -> H,
-    {
-        let h: H;
-        {
-            let pointer = self.reference as *const T;
-            let reference = unsafe { pointer.as_ref() }.unwrap();
-            h = f(reference);
-        }
-
-        OwningHandle {
-            handle: h,
-            _owner: self.owner,
-        }
-    }
-
     /// Converts `self` into a new owning reference that points at something reachable
     /// from the previous one or from the owner itself.
     ///
